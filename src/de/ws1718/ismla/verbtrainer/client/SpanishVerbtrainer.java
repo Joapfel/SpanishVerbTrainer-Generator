@@ -1,6 +1,11 @@
 package de.ws1718.ismla.verbtrainer.client;
 
 import de.ws1718.ismla.verbtrainer.shared.FieldVerifier;
+import de.ws1718.ismla.verbtrainer.shared.TokenExercise;
+import javafx.beans.binding.StringBinding;
+
+import java.util.List;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -8,6 +13,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
@@ -117,22 +123,43 @@ public class SpanishVerbtrainer implements EntryPoint {
 				sendButton.setEnabled(false);
 				textToServerLabel.setText(textToServer);
 				serverResponseLabel.setText("");
-				greetingService.greetServer(textToServer, new AsyncCallback<String>() {
-					public void onFailure(Throwable caught) {
-						// Show the RPC error message to the user
-						dialogBox.setText("Remote Procedure Call - Failure");
-						serverResponseLabel.addStyleName("serverResponseLabelError");
-						serverResponseLabel.setHTML(SERVER_ERROR);
-						dialogBox.center();
-						closeButton.setFocus(true);
+//				greetingService.greetServer(textToServer, new AsyncCallback<String>() {
+//					public void onFailure(Throwable caught) {
+//						// Show the RPC error message to the user
+//						dialogBox.setText("Remote Procedure Call - Failure");
+//						serverResponseLabel.addStyleName("serverResponseLabelError");
+//						serverResponseLabel.setHTML(SERVER_ERROR);
+//						dialogBox.center();
+//						closeButton.setFocus(true);
+//					}
+//
+//					public void onSuccess(String result) {
+//						dialogBox.setText("Remote Procedure Call");
+//						serverResponseLabel.removeStyleName("serverResponseLabelError");
+//						serverResponseLabel.setHTML(result);
+//						dialogBox.center();
+//						closeButton.setFocus(true);
+//					}
+//				});
+				
+				greetingService.getTokensForExercise(textToServer, new AsyncCallback<List<TokenExercise>>() {
+					
+					@Override
+					public void onSuccess(List<TokenExercise> result) {
+						// TODO Auto-generated method stub
+						Window.alert("SUCCESS");
+						StringBuilder sb = new StringBuilder();
+						for(TokenExercise tokenEx : result){
+							
+							sb.append(tokenEx.getToken() +  " -> " + tokenEx.isVerb() + "\n");
+						}
+						Window.alert(sb.toString());
 					}
-
-					public void onSuccess(String result) {
-						dialogBox.setText("Remote Procedure Call");
-						serverResponseLabel.removeStyleName("serverResponseLabelError");
-						serverResponseLabel.setHTML(result);
-						dialogBox.center();
-						closeButton.setFocus(true);
+					
+					@Override
+					public void onFailure(Throwable caught) {
+						// TODO Auto-generated method stub
+						Window.alert("FAILED");
 					}
 				});
 			}
