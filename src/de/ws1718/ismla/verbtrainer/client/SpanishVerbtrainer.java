@@ -43,6 +43,7 @@ public class SpanishVerbtrainer implements EntryPoint {
 	public void onModuleLoad() {
 		
 		final TextArea textArea = new TextArea();
+		textArea.setStyleName("textArea");
 		
 		final HTMLPanel exerciseContainer = new HTMLPanel("");
 		
@@ -61,7 +62,7 @@ public class SpanishVerbtrainer implements EntryPoint {
 						// TODO Auto-generated method stub
 //						Window.alert("SUCCESS");
 
-						List<TextBox> submissions = new ArrayList<>();
+						final List<TextBox> submissions = new ArrayList<>();
 						
 						//create exercises
 						for(TokenExercise tokenEx : result){	
@@ -108,7 +109,7 @@ public class SpanishVerbtrainer implements EntryPoint {
 		
 
 		RootPanel.get("textAreaContainer").add(textArea);
-		RootPanel.get("textAreaContainer").add(sendButton);
+		RootPanel.get("sendButton").add(sendButton);
 		RootPanel.get("exercise_view").add(exerciseContainer);
 
 

@@ -13,6 +13,35 @@
     <!--                                                               -->
     <link type="text/css" rel="stylesheet" href="SpanishVerbtrainer.css">
 
+    <style type="text/css">
+      #hashtag{
+        text-align: center;
+        font: sans-serif;
+        font-size: 500px;
+      }
+
+      #application_heading{
+        text-align: center;
+        font: sans-serif;
+        font-size: 130px;
+        padding-top: 150px;
+        line-height: 1em; 
+        height: 716px;
+      }
+
+      #textAreaContainer{
+        text-align: center;
+        height: 716px;
+      }
+
+      .textArea{
+        width: 80%;
+        height: 400px;
+        margin-top: 160px;
+        border: 3px solid black;
+      }
+    </style>
+
     <!--                                           -->
     <!-- Any title is fine                         -->
     <!--                                           -->
@@ -24,6 +53,16 @@
     <!-- be added before this line.                -->
     <!--                                           -->
     <script type="text/javascript" language="javascript" src="spanishverbtrainer/spanishverbtrainer.nocache.js"></script>
+
+    <!-- Bootstrap -->
+<link rel="stylesheet"
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet"
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+<!-- Latest compiled and minified JavaScript -->
+<!-- <script
+  src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> -->
+
   </head>
 
   <!--                                           -->
@@ -41,10 +80,34 @@
       </div>
     </noscript>
 
-    <h1>Test heading</h1>
-
     <div id="starting_page"></div>
-    <div id="textAreaContainer"></div>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div id="application_container" class="col-lg-12 col-md-12 col-sm-12">
+
+          <div id="hashtag" class="col-lg-3 col-md-6 col-sm-12">#</div>
+      
+          <div id="application_heading" class="col-lg-3 col-md-6 col-sm-12">
+
+            <span>spanish</span>
+            </br>
+            <span>verb</span>
+            </br>
+            <span>trainer</span>
+
+          </div>
+
+
+          <div id="textAreaContainer" class="col-lg-6 col-md-12 col-sm-12"></div>
+
+      </div>
+      
+    </div>
+    </div>
+
+    <div id="sendButton"></div>
+
     <div id="exercise_view"></div>
 
 
