@@ -1,6 +1,7 @@
 package de.ws1718.ismla.verbtrainer.client;
 
 import de.ws1718.ismla.verbtrainer.shared.FieldVerifier;
+import de.ws1718.ismla.verbtrainer.shared.Submitted;
 import de.ws1718.ismla.verbtrainer.shared.TokenExercise;
 import javafx.beans.binding.StringBinding;
 
@@ -46,6 +47,7 @@ public class SpanishVerbtrainer implements EntryPoint {
 		textArea.setStyleName("textArea");
 		
 		final HTMLPanel exerciseContainer = new HTMLPanel("");
+		exerciseContainer.setStyleName("exerciseContainer");
 		
 		final Button sendButton = new Button("Send");
 		sendButton.addStyleName("sendButton");
@@ -61,45 +63,110 @@ public class SpanishVerbtrainer implements EntryPoint {
 					public void onSuccess(List<TokenExercise> result) {
 						// TODO Auto-generated method stub
 //						Window.alert("SUCCESS");
+						
+						//hide the button and the textbox
+						sendButton.setVisible(false);
+						textArea.setVisible(false);
+						textArea.setText("");
+						exerciseContainer.clear();
+						exerciseContainer.setVisible(true);
+						
 
 						final List<TextBox> submissions = new ArrayList<>();
+						final List<TokenExercise> correctVerbForms = new ArrayList<>();
 						
 						//create exercises
 						for(TokenExercise tokenEx : result){	
-							
+	
 							if(tokenEx.isVerb()){
 								TextBox tb = new TextBox();
 								submissions.add(tb);
+								//store the correct forms for later
+								correctVerbForms.add(tokenEx);
 								exerciseContainer.add(tb);
-								exerciseContainer.add(new InlineHTML("<span id='token_hint'>(" + tokenEx.getToken() + ")</span>"));
+								exerciseContainer.add(new InlineHTML("<span id='token_hint'>(" + tokenEx.getVerbLemma() + ")</span>"));
 							}else{
-								exerciseContainer.add(new InlineHTML("<span id='token'> " + tokenEx.getToken() + " </span>"));
+								exerciseContainer.add(new InlineHTML("<span id='token'> " + tokenEx.getOriginalToken() + " </span>"));
 							}
 						}
 						
 						//create submit button
-						Button submitButton = new Button("Submit");
+						final Button submitButton = new Button("Submit");
 						submitButton.addStyleName("submitButton");
 						submitButton.addClickHandler(new ClickHandler() {
 							
 							@Override
 							public void onClick(ClickEvent event) {
 								// TODO Auto-generated method stub
+								final List<Submitted> submissionsCheck = new ArrayList<>();
+								
 								StringBuilder sb = new StringBuilder();
-								for(TextBox tb : submissions){
-									sb.append(tb.getText());
+								for(int i = 0; i < submissions.size(); i++){
+									TextBox tb = submissions.get(i);
+									String correctAnswer = correctVerbForms.get(i).getOriginalToken();
+									Submitted submittedToken = new Submitted(tb.getText().trim(), correctAnswer);
+									submissionsCheck.add(submittedToken);
+									
+									sb.append(tb.getText() +  " ");
+									
+									Window.alert(correctAnswer);
 								}
-								Window.alert(sb.toString());
+//								Window.alert(sb.toString());
+								
+								//check the submissions
+								client2Server.getResultsForSubmission(submissionsCheck, new AsyncCallback<List<Submitted>>() {
+									
+									@Override
+									public void onSuccess(List<Submitted> result) {
+										// TODO Auto-generated method stub
+										for(int i = 0; i < result.size(); i++){
+											if(result.get(i).isCorrectSubmission()){
+												//mark it as correct
+												TextBox tb = submissions.get(i);
+												tb.setText(result.get(i).getSubmitedToken().toUpperCase());
+											}else{
+												//mark it as wrong
+												TextBox tb = submissions.get(i);
+												tb.setText(result.get(i).getSubmitedToken().toLowerCase() + " -> " + result.get(i).getOriginalToken());
+											}
+										}
+										
+										//hide the button
+										submitButton.setVisible(false);
+//										
+										//create a reset button
+										final Button resetButton = new Button("Reset");
+										RootPanel.get("resetButton").add(resetButton);
+										resetButton.addClickHandler(new ClickHandler() {
+											
+											@Override
+											public void onClick(ClickEvent event) {
+												// TODO Auto-generated method stub
+												resetButton.setVisible(false);
+												exerciseContainer.setVisible(false);
+												textArea.setVisible(true);
+												sendButton.setVisible(true);
+											}
+										});
+									}
+									
+									@Override
+									public void onFailure(Throwable caught) {
+										// TODO Auto-generated method stub
+										Window.alert("FAILED TO CHECK THE SUBMISSION(S)");
+									}
+								});
 							}
 						});
 						
-						RootPanel.get("exercise_view").add(submitButton);
+						RootPanel.get("submitButton").add(submitButton);
+						
 					}
 					
 					@Override
 					public void onFailure(Throwable caught) {
 						// TODO Auto-generated method stub
-						Window.alert("FAILED");
+						Window.alert("FAILED TO PROCESS THE TEXT");
 					}
 				});
 				
@@ -109,8 +176,9 @@ public class SpanishVerbtrainer implements EntryPoint {
 		
 
 		RootPanel.get("textAreaContainer").add(textArea);
+		RootPanel.get("textAreaContainer").add(exerciseContainer);
 		RootPanel.get("sendButton").add(sendButton);
-		RootPanel.get("exercise_view").add(exerciseContainer);
+		
 
 
 	}

@@ -19,6 +19,12 @@ public class Submitted implements Serializable{
 		this.correctSubmission = correctSubmission;
 	}
 
+	public Submitted(String submitedToken, String originalToken) {
+		super();
+		this.submitedToken = submitedToken;
+		this.originalToken = originalToken;
+	}
+
 	public String getSubmitedToken() {
 		return submitedToken;
 	}

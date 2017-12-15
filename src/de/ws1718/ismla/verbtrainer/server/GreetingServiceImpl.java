@@ -50,12 +50,12 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 				if (verbMapping.keySet().contains(w)) {
 
 					String hint = verbMapping.get(w);
-					rval.add(new TokenExercise(hint, true));
+					rval.add(new TokenExercise(w, hint, true));
 					System.out.println(hint);
 					
 				} else {
 					
-					rval.add(new TokenExercise(w, false));
+					rval.add(new TokenExercise(w, "", false));
 					System.out.println("nicht vorhanden...");
 					
 				}
@@ -73,41 +73,16 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 	@Override
 	public List<Submitted> getResultsForSubmission(List<Submitted> submittedResults) {
 		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public String greetServer(String input) throws IllegalArgumentException {
-
-		System.out.println("HALLO WELT");
-
-		
-
-		// for(String s : verbMapping.keySet()){
-		//
-		// String target = verbMapping.get(s);
-		//
-		// System.out.println(s + " -> " + target);
-		// }
-
-		// Verify that the input is valid.
-		if (!FieldVerifier.isValidName(input)) {
-			// If the input is not valid, throw an IllegalArgumentException back
-			// to
-			// the client.
-			throw new IllegalArgumentException("Name must be at least 4 characters long");
+		for(Submitted submitted : submittedResults){
+			String targetAnswer = submitted.getOriginalToken();
+			String answer = submitted.getSubmitedToken();
+			if(targetAnswer.trim().equals(answer.trim())){
+				submitted.setCorrectSubmission(true);
+			}
 		}
-
-		String serverInfo = getServletContext().getServerInfo();
-		String userAgent = getThreadLocalRequest().getHeader("User-Agent");
-
-		// Escape data from the client to avoid cross-site script
-		// vulnerabilities.
-		input = escapeHtml(input);
-		userAgent = escapeHtml(userAgent);
-
-		return "Hello, " + input + "!<br><br>I am running " + serverInfo + ".<br><br>It looks like you are using:<br>"
-				+ userAgent;
+		return submittedResults;
 	}
+
 
 	/**
 	 * Escape an html string. Escaping data received from the client helps to
@@ -122,6 +97,12 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 			return null;
 		}
 		return html.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+	}
+
+	@Override
+	public String greetServer(String name) throws IllegalArgumentException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
