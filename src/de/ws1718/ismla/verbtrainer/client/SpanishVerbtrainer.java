@@ -51,6 +51,7 @@ public class SpanishVerbtrainer implements EntryPoint {
 		
 		final Button sendButton = new Button("Send");
 		sendButton.addStyleName("sendButton");
+//		sendButton.addStyleName("btn btn-info btn-lg btn-block");
 		sendButton.addClickHandler(new ClickHandler() {
 			
 			@Override
@@ -81,6 +82,8 @@ public class SpanishVerbtrainer implements EntryPoint {
 							if(tokenEx.isVerb()){
 								TextBox tb = new TextBox();
 								submissions.add(tb);
+								int width = tokenEx.getOriginalToken().length();
+								tb.setWidth(width + "em");
 								//store the correct forms for later
 								correctVerbForms.add(tokenEx);
 								exerciseContainer.add(tb);
@@ -93,25 +96,20 @@ public class SpanishVerbtrainer implements EntryPoint {
 						//create submit button
 						final Button submitButton = new Button("Submit");
 						submitButton.addStyleName("submitButton");
+//						submitButton.addStyleName("btn btn-success btn-lg btn-block");
 						submitButton.addClickHandler(new ClickHandler() {
 							
 							@Override
 							public void onClick(ClickEvent event) {
 								// TODO Auto-generated method stub
 								final List<Submitted> submissionsCheck = new ArrayList<>();
-								
-								StringBuilder sb = new StringBuilder();
+
 								for(int i = 0; i < submissions.size(); i++){
 									TextBox tb = submissions.get(i);
 									String correctAnswer = correctVerbForms.get(i).getOriginalToken();
 									Submitted submittedToken = new Submitted(tb.getText().trim(), correctAnswer);
 									submissionsCheck.add(submittedToken);
-									
-									sb.append(tb.getText() +  " ");
-									
-									Window.alert(correctAnswer);
 								}
-//								Window.alert(sb.toString());
 								
 								//check the submissions
 								client2Server.getResultsForSubmission(submissionsCheck, new AsyncCallback<List<Submitted>>() {
@@ -120,14 +118,21 @@ public class SpanishVerbtrainer implements EntryPoint {
 									public void onSuccess(List<Submitted> result) {
 										// TODO Auto-generated method stub
 										for(int i = 0; i < result.size(); i++){
+											
 											if(result.get(i).isCorrectSubmission()){
 												//mark it as correct
 												TextBox tb = submissions.get(i);
-												tb.setText(result.get(i).getSubmitedToken().toUpperCase());
+												tb.setText(result.get(i).getSubmitedToken());
+												tb.addStyleName("success");
+												
 											}else{
 												//mark it as wrong
 												TextBox tb = submissions.get(i);
-												tb.setText(result.get(i).getSubmitedToken().toLowerCase() + " -> " + result.get(i).getOriginalToken());
+												tb.setText(result.get(i).getSubmitedToken());
+												tb.addStyleName("fail");
+												tb.setTitle(result.get(i).getOriginalToken());
+												tb.getElement().setAttribute("data-toggle", "tooltip");
+												initTooltips();
 											}
 										}
 										
@@ -136,6 +141,8 @@ public class SpanishVerbtrainer implements EntryPoint {
 //										
 										//create a reset button
 										final Button resetButton = new Button("Reset");
+										resetButton.addStyleName("resetButton");
+//										resetButton.addStyleName("btn btn-danger btn-lg btn-block");
 										RootPanel.get("resetButton").add(resetButton);
 										resetButton.addClickHandler(new ClickHandler() {
 											
@@ -182,4 +189,8 @@ public class SpanishVerbtrainer implements EntryPoint {
 
 
 	}
+	
+	public static native void initTooltips() /*-{
+		$wnd.jQuery("[data-toggle='tooltip']").tooltip();
+	}-*/;
 }
